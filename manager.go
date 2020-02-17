@@ -28,7 +28,7 @@ func New() *Manager {
 	}
 }
 
-// ConfigureOption is an insert option.
+// ConfigureOption is a Disk configuration option.
 type ConfigureOption func(*configureConfig)
 
 type configureConfig struct {
