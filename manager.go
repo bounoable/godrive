@@ -95,9 +95,9 @@ func (m *Manager) RemoveDisk(name string) {
 	delete(m.disks, name)
 }
 
-// GetDisk returns the Disk with the configured name.
+// Disk returns the Disk with the configured name.
 // If no Disk with the name is configured, it returns an UnconfiguredDiskError.
-func (m *Manager) GetDisk(name string) (Disk, error) {
+func (m *Manager) Disk(name string) (Disk, error) {
 	m.mux.RLock()
 	defer m.mux.RUnlock()
 	disk, ok := m.disks[name]
@@ -120,7 +120,7 @@ func (err UnconfiguredDiskError) Error() string {
 // Put writes b to the file at the given path on the default Disk.
 // If no default Disk is set, it returns ErrNoDefaultDisk.
 func (m *Manager) Put(ctx context.Context, path string, b []byte) error {
-	disk, err := m.GetDisk(m.defaultDisk)
+	disk, err := m.Disk(m.defaultDisk)
 	if err != nil {
 		if errors.As(err, &UnconfiguredDiskError{}) {
 			return ErrNoDefaultDisk
@@ -135,7 +135,7 @@ func (m *Manager) Put(ctx context.Context, path string, b []byte) error {
 // Get retrieves the file at the given path.
 // If no default Disk is set, it returns ErrNoDefaultDisk.
 func (m *Manager) Get(ctx context.Context, path string) ([]byte, error) {
-	disk, err := m.GetDisk(m.defaultDisk)
+	disk, err := m.Disk(m.defaultDisk)
 	if err != nil {
 		if errors.As(err, &UnconfiguredDiskError{}) {
 			return nil, ErrNoDefaultDisk
@@ -150,7 +150,7 @@ func (m *Manager) Get(ctx context.Context, path string) ([]byte, error) {
 // Delete deletes the file at the given path.
 // If no default Disk is set, it returns ErrNoDefaultDisk.
 func (m *Manager) Delete(ctx context.Context, path string) error {
-	disk, err := m.GetDisk(m.defaultDisk)
+	disk, err := m.Disk(m.defaultDisk)
 	if err != nil {
 		if errors.As(err, &UnconfiguredDiskError{}) {
 			return ErrNoDefaultDisk
@@ -166,7 +166,7 @@ func (m *Manager) Delete(ctx context.Context, path string) error {
 // If no default Disk is set, it returns ErrNoDefaultDisk.
 // If the default Disk does not implement URLProvider, it returns an UnimplementedError.
 func (m *Manager) GetURL(ctx context.Context, path string) (string, error) {
-	disk, err := m.GetDisk(m.defaultDisk)
+	disk, err := m.Disk(m.defaultDisk)
 	if err != nil {
 		if errors.As(err, &UnconfiguredDiskError{}) {
 			return "", ErrNoDefaultDisk
