@@ -38,10 +38,12 @@ func (fn DiskCreatorFunc) CreateDisk(ctx context.Context, cfg map[string]interfa
 
 // NewAutoWire returns a new autowire configuration.
 func NewAutoWire() AutoWireConfig {
-	return AutoWireConfig{
+	cfg := AutoWireConfig{
 		Disks:    make(map[string]DiskCreatorConfig),
 		Creators: make(map[string]DiskCreator),
 	}
+
+	return cfg
 }
 
 // RegisterProvider registers a storage disk creator.

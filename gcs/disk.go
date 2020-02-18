@@ -27,6 +27,9 @@ type Config struct {
 type Option func(*Config)
 
 // Public configures the disk to make all uploaded files publicly accessible.
+// Note that this option will not work and storing files will return an error
+// if "uniform bucket-level access" is configured on the bucket, because
+// individual ACL for specific objects is not available for those buckets.
 func Public(public bool) Option {
 	return func(cfg *Config) {
 		cfg.Public = public

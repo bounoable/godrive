@@ -21,7 +21,10 @@ type Manager struct {
 	defaultDisk string
 }
 
-// New returns a new Manager.
+// New returns a new disk manager. The disk manager is a container for multiple storage disks
+// and also implements the Disk interface, so it can be directly used to access the configured default disk.
+//
+// Normally you don't instantiate the manager with New() but through the AutoWire config.
 func New() *Manager {
 	return &Manager{
 		disks: make(map[string]Disk),
