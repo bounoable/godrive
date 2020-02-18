@@ -15,7 +15,7 @@ const (
 	Provider = "gcs"
 )
 
-// Register registered the Google Cloud Storage as a provider for the disk autowire.
+// Register registeres Google Cloud Storage as a provider for the disk autowire.
 func Register(cfg godrive.AutoWireConfig) {
 	cfg.RegisterProvider(Provider, godrive.DiskCreatorFunc(NewAutoWire))
 }
