@@ -20,7 +20,7 @@ func Register(cfg godrive.AutoWireConfig) {
 	cfg.RegisterProvider(Provider, godrive.DiskCreatorFunc(NewAutoWire))
 }
 
-// NewAutoWire creates a new Google Cloud Storage disk from an auto-create configuration.
+// NewAutoWire creates a new Google Cloud Storage disk from an autowire configuration.
 func NewAutoWire(ctx context.Context, cfg map[string]interface{}) (godrive.Disk, error) {
 	if cfg == nil {
 		cfg = make(map[string]interface{})
@@ -68,7 +68,7 @@ func NewAutoWire(ctx context.Context, cfg map[string]interface{}) (godrive.Disk,
 	return NewDisk(client, bucket, Public(public)), nil
 }
 
-// InvalidConfigValueError means the auto-create configuration has an invalid config value.
+// InvalidConfigValueError means the autowire configuration has an invalid config value.
 type InvalidConfigValueError struct {
 	Key     string
 	Details string
