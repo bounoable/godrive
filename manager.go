@@ -79,7 +79,7 @@ func (m *Manager) Configure(name string, disk Disk, options ...ConfigureOption) 
 	return nil
 }
 
-// DuplicateNameError is returned when a Disk is added to a Rack with a name that was already used.
+// DuplicateNameError is returned when a Disk is added to a Manager with a name that was already used.
 type DuplicateNameError struct {
 	Name string
 }

@@ -66,7 +66,7 @@ func (cfg AutoWireConfig) NewManager(ctx context.Context) (*Manager, error) {
 	m := New()
 
 	for diskname, diskcfg := range cfg.Disks {
-		creator, ok := cfg.Creators[diskname]
+		creator, ok := cfg.Creators[diskcfg.Provider]
 		if !ok {
 			return nil, UnregisteredProviderError{Provider: diskcfg.Provider}
 		}

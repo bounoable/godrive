@@ -1,6 +1,7 @@
 package godrive_test
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -61,4 +62,46 @@ func TestLoad(t *testing.T) {
 	}
 
 	assert.Equal(t, "s3", cfg.DefaultDiskName)
+}
+
+func TestNewManager(t *testing.T) {
+	cfg := godrive.NewAutoWire()
+
+	cfg.RegisterProvider("test", godrive.DiskCreatorFunc(testDiskCreator))
+	cfg.Configure("main", "test", map[string]interface{}{
+		"key1": "value1",
+		"key2": 2,
+		"key3": true,
+	})
+
+	m, err := cfg.NewManager(context.Background())
+	assert.Nil(t, err)
+
+	disk, err := m.Disk("main")
+	assert.Nil(t, err)
+
+	tdisk, ok := disk.(testDisk)
+	assert.True(t, ok)
+
+	assert.Equal(t, "value1", tdisk.Key1)
+	assert.Equal(t, 2, tdisk.Key2)
+	assert.True(t, tdisk.Key3)
+}
+
+type testDisk struct {
+	Key1 string
+	Key2 int
+	Key3 bool
+}
+
+func (d testDisk) Put(_ context.Context, _ string, _ []byte) error { return nil }
+func (d testDisk) Get(_ context.Context, _ string) ([]byte, error) { return nil, nil }
+func (d testDisk) Delete(_ context.Context, _ string) error        { return nil }
+
+func testDiskCreator(_ context.Context, cfg map[string]interface{}) (godrive.Disk, error) {
+	return testDisk{
+		Key1: cfg["key1"].(string),
+		Key2: cfg["key2"].(int),
+		Key3: cfg["key3"].(bool),
+	}, nil
 }
