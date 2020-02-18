@@ -1,0 +1,21 @@
+default: s3
+
+disks:
+  googlecloud:
+    provider: gcs
+    config:
+      serviceAccount: /path/to/service/account.json
+      bucket: uploads
+      public: true
+  
+  amazonaws:
+    provider: s3
+    config:
+      region: us-east-2
+      bucket: images
+      accessKeyId: some-access-key-id
+      secretAccessKey: some-secret-access-key
+      public: true
+  
+  other:
+    provider: other

@@ -101,7 +101,7 @@ func (err UnregisteredProviderError) Error() string {
 // Load loads the disk configuration from a file.
 // It checks against provided file extensions and
 // returns an error if the filetype is unsupported.
-func (cfg AutoWireConfig) Load(path string) error {
+func (cfg *AutoWireConfig) Load(path string) error {
 	ext := filepath.Ext(path)
 
 	switch ext {
@@ -115,7 +115,7 @@ func (cfg AutoWireConfig) Load(path string) error {
 }
 
 // LoadYAML loads the disk configuration from a YAML file.
-func (cfg AutoWireConfig) LoadYAML(path string) error {
+func (cfg *AutoWireConfig) LoadYAML(path string) error {
 	f, err := os.Open(path)
 	if err != nil {
 		return err
@@ -126,7 +126,7 @@ func (cfg AutoWireConfig) LoadYAML(path string) error {
 }
 
 // LoadYAMLReader loads the disk configuration from the YAML in r.
-func (cfg AutoWireConfig) LoadYAMLReader(r io.Reader) error {
+func (cfg *AutoWireConfig) LoadYAMLReader(r io.Reader) error {
 	var yamlcfg autowireYamlConfig
 	if err := yaml.NewDecoder(r).Decode(&yamlcfg); err != nil {
 		return err
@@ -146,7 +146,7 @@ type autowireYamlConfig struct {
 	Default string
 }
 
-func (cfg autowireYamlConfig) apply(config AutoWireConfig) error {
+func (cfg autowireYamlConfig) apply(config *AutoWireConfig) error {
 	disks := make(map[string]DiskCreatorConfig)
 
 	for diskname, diskcfg := range cfg.Disks {
