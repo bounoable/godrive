@@ -35,8 +35,8 @@ disks:
     config: # Configuration for the storage provider
       region: us-east-2
       bucket: images
-      accessKeyId: some-access-key-id
-      secretAccessKey: some-secret-access-key
+      accessKeyId: ${AWS_ACCESS_KEY_ID} # Use environment variable
+      secretAccessKey: ${AWS_SECRET_ACCESS_KEY}
       public: true
   
   videos:

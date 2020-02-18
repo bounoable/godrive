@@ -11,6 +11,9 @@ import (
 )
 
 func TestLoad(t *testing.T) {
+	os.Setenv("AWS_ACCESS_KEY_ID", "some-access-key-id")
+	os.Setenv("AWS_SECRET_ACCESS_KEY", "some-secret-access-key")
+
 	wd, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)

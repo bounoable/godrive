@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"gopkg.in/yaml.v3"
 )
@@ -181,6 +182,8 @@ func (cfg autowireYamlConfig) apply(config *AutoWireConfig) error {
 			varcfg = tcfg
 		}
 
+		applyEnvVars(varcfg)
+
 		disks[diskname] = DiskCreatorConfig{
 			Provider: provider,
 			Config:   varcfg,
@@ -215,4 +218,23 @@ type InvalidConfigValueError struct {
 
 func (err InvalidConfigValueError) Error() string {
 	return fmt.Sprintf("invalid config value for disk '%s': '%s' must be a '%T' but is a '%T'", err.DiskName, err.ConfigKey, err.Expected, err.Provided)
+}
+
+func applyEnvVars(cfg map[string]interface{}) {
+	for key, val := range cfg {
+		switch v := val.(type) {
+		case map[string]interface{}:
+			applyEnvVars(v)
+		case string:
+			cfg[key] = replaceEnvPlaceholders(v)
+		}
+	}
+}
+
+var envPlaceholderExpr = regexp.MustCompile(`(?Ui)\${(.+)}`)
+
+func replaceEnvPlaceholders(val string) string {
+	return envPlaceholderExpr.ReplaceAllStringFunc(val, func(placeholder string) string {
+		return os.Getenv(envPlaceholderExpr.ReplaceAllString(placeholder, "$1"))
+	})
 }
