@@ -12,8 +12,9 @@ import (
 
 // AutoWireConfig contains the configuration for the disk autowire.
 type AutoWireConfig struct {
-	Disks    map[string]DiskCreatorConfig
-	Creators map[string]DiskCreator
+	Disks           map[string]DiskCreatorConfig
+	Creators        map[string]DiskCreator
+	DefaultDiskName string
 }
 
 // DiskCreatorConfig is the configuration for the creation of a single storage disk.
@@ -75,7 +76,12 @@ func (cfg AutoWireConfig) NewManager(ctx context.Context) (*Manager, error) {
 			return nil, err
 		}
 
-		if err := m.Configure(diskname, disk, Replace()); err != nil {
+		opts := []ConfigureOption{Replace()}
+		if cfg.DefaultDiskName == diskname {
+			opts = append(opts, Default())
+		}
+
+		if err := m.Configure(diskname, disk, opts...); err != nil {
 			return nil, err
 		}
 	}
@@ -133,13 +139,17 @@ func (cfg AutoWireConfig) LoadYAMLReader(r io.Reader) error {
 	return nil
 }
 
-// map[DISKNAME]map[CONFIGKEY]interface{}
-type autowireYamlConfig map[string]map[string]interface{}
+type autowireYamlConfig struct {
+	// map[DISKNAME]map[CONFIGKEY]interface{}
+	Disks map[string]map[string]interface{}
+	// Default is the name of the default disk.
+	Default string
+}
 
 func (cfg autowireYamlConfig) apply(config AutoWireConfig) error {
 	disks := make(map[string]DiskCreatorConfig)
 
-	for diskname, diskcfg := range cfg {
+	for diskname, diskcfg := range cfg.Disks {
 		if _, ok := disks[diskname]; ok {
 			return DuplicateDiskConfigError{DiskName: diskname}
 		}
@@ -178,6 +188,8 @@ func (cfg autowireYamlConfig) apply(config AutoWireConfig) error {
 	for diskname, creatorcfg := range disks {
 		config.Configure(diskname, creatorcfg.Provider, creatorcfg.Config)
 	}
+
+	config.DefaultDiskName = cfg.Default
 
 	return nil
 }
