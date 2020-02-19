@@ -17,7 +17,7 @@ const (
 )
 
 // Register registeres Amazon S3 as a provider for the disk autowire.
-func Register(cfg godrive.AutoWireConfig) {
+func Register(cfg *godrive.AutoWireConfig) {
 	cfg.RegisterProvider(Provider, godrive.DiskCreatorFunc(NewAutoWire))
 }
 

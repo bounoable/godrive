@@ -37,23 +37,30 @@ func (fn DiskCreatorFunc) CreateDisk(ctx context.Context, cfg map[string]interfa
 	return fn(ctx, cfg)
 }
 
+// AutoWireOption is an autowire option.
+type AutoWireOption func(*AutoWireConfig)
+
 // NewAutoWire returns a new autowire configuration.
-func NewAutoWire() AutoWireConfig {
+func NewAutoWire(options ...AutoWireOption) *AutoWireConfig {
 	cfg := AutoWireConfig{
 		Disks:    make(map[string]DiskCreatorConfig),
 		Creators: make(map[string]DiskCreator),
 	}
 
-	return cfg
+	for _, opt := range options {
+		opt(&cfg)
+	}
+
+	return &cfg
 }
 
 // RegisterProvider registers a storage disk creator.
-func (cfg AutoWireConfig) RegisterProvider(name string, creator DiskCreator) {
+func (cfg *AutoWireConfig) RegisterProvider(name string, creator DiskCreator) {
 	cfg.Creators[name] = creator
 }
 
 // Configure adds a disk to the configuration.
-func (cfg AutoWireConfig) Configure(diskname, provider string, config map[string]interface{}) {
+func (cfg *AutoWireConfig) Configure(diskname, provider string, config map[string]interface{}) {
 	if config == nil {
 		config = make(map[string]interface{})
 	}
@@ -65,7 +72,7 @@ func (cfg AutoWireConfig) Configure(diskname, provider string, config map[string
 }
 
 // NewManager creates a new Manager with the initialized storage disks.
-func (cfg AutoWireConfig) NewManager(ctx context.Context) (*Manager, error) {
+func (cfg *AutoWireConfig) NewManager(ctx context.Context) (*Manager, error) {
 	m := New()
 
 	for diskname, diskcfg := range cfg.Disks {

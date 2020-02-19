@@ -31,10 +31,10 @@ func ExampleNew() {
 }
 
 func ExampleNewAutoWire() {
-	aw := godrive.NewAutoWire()
-
-	s3.Register(aw)  // Register Amazon S3
-	gcs.Register(aw) // Register Google Cloud Storage
+	aw := godrive.NewAutoWire(
+		s3.Register,  // Register Amazon S3
+		gcs.Register, // Register Google Cloud Storage
+	)
 
 	err := aw.Load("/path/to/config.yml") // Load the autowire configuration
 	if err != nil {

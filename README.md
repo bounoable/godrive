@@ -60,10 +60,10 @@ import (
 
 func main() {
     // Initialize autowire & register providers
-    aw := godrive.NewAutoWire()
-
-    s3.Register(aw)
-    gcs.Register(aw)
+    aw := godrive.NewAutoWire(
+      s3.Register,
+      gcs.Register,
+    )
 
     // Load disk configuration
     err := aw.Load("/path/to/config.yml")
