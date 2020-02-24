@@ -4,11 +4,17 @@ package gcs
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"io/ioutil"
+	"strings"
+	"text/template"
 
 	gcs "cloud.google.com/go/storage"
+)
+
+const (
+	// DefaultURLTemplate is the default URL template to use for (*Disk).GetURL().
+	DefaultURLTemplate = "https://storage.googleapis.com/{{ .Bucket }}/{{ .Path }}"
 )
 
 // Disk is the Google Cloud Storage disk.
@@ -19,8 +25,9 @@ type Disk struct {
 
 // Config is the disk configuration.
 type Config struct {
-	Bucket string
-	Public bool
+	Bucket      string
+	Public      bool
+	URLTemplate string
 }
 
 // Option is a disk configuration option.
@@ -36,13 +43,24 @@ func Public(public bool) Option {
 	}
 }
 
+// URLTemplate overrides the default template for public URLs.
+func URLTemplate(tpl string) Option {
+	return func(cfg *Config) {
+		cfg.URLTemplate = tpl
+	}
+}
+
 // NewDisk creates a new Google Cloud Storage disk.
 func NewDisk(client *gcs.Client, bucket string, options ...Option) *Disk {
 	if client == nil {
 		panic("invalid google cloud storage client")
 	}
 
-	cfg := Config{Bucket: bucket}
+	cfg := Config{
+		Bucket:      bucket,
+		URLTemplate: DefaultURLTemplate,
+	}
+
 	for _, opt := range options {
 		opt(&cfg)
 	}
@@ -95,5 +113,21 @@ func (d *Disk) Delete(ctx context.Context, path string) error {
 
 // GetURL returns the public URL for the file at the given path.
 func (d *Disk) GetURL(_ context.Context, path string) (string, error) {
-	return fmt.Sprintf("https://storage.googleapis.com/%s/%s", d.Config.Bucket, path), nil
+	tpl, err := template.New("url").Parse(d.Config.URLTemplate)
+	if err != nil {
+		return "", err
+	}
+
+	var buf strings.Builder
+	if err := tpl.Execute(&buf, struct {
+		Bucket string
+		Path   string
+	}{
+		Bucket: d.Config.Bucket,
+		Path:   path,
+	}); err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
 }

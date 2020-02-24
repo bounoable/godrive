@@ -8,6 +8,13 @@ disks:
       bucket: uploads
       public: true
   
+  googlecloud2:
+    provider: gcs
+    config:
+      serviceAccount: /path/to/service/account.json
+      bucket: uploads
+      urlTemplate: https://storage.customdomain.test/{{ .Bucket }}/{{ .Path }}
+  
   amazonaws:
     provider: s3
     config:

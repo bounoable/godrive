@@ -39,6 +39,15 @@ func TestLoad(t *testing.T) {
 			},
 		},
 		{
+			name:     "googlecloud2",
+			provider: "gcs",
+			config: map[string]interface{}{
+				"serviceAccount": "/path/to/service/account.json",
+				"bucket":         "uploads",
+				"urlTemplate":    "https://storage.customdomain.test/{{ .Bucket }}/{{ .Path }}",
+			},
+		},
+		{
 			name:     "amazonaws",
 			provider: "s3",
 			config: map[string]interface{}{
