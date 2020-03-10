@@ -3,7 +3,7 @@
   <a href="https://pkg.go.dev/github.com/bounoable/godrive">
     <img alt="GoDoc" src="https://img.shields.io/badge/godoc-reference-purple">
   </a>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.3.0-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/github/v/tag/bounoable/godrive" />
   <a href="#" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>

@@ -73,10 +73,15 @@ func NewDisk(client *gcs.Client, bucket string, options ...Option) *Disk {
 
 // Put writes b to the file at the given path.
 func (d *Disk) Put(ctx context.Context, path string, b []byte) error {
+	return d.PutReader(ctx, path, bytes.NewReader(b))
+}
+
+// PutReader writes r to the file at the given path.
+func (d *Disk) PutReader(ctx context.Context, path string, r io.Reader) error {
 	obj := d.Client.Bucket(d.Config.Bucket).Object(path)
 
 	w := obj.NewWriter(ctx)
-	if _, err := io.Copy(w, bytes.NewReader(b)); err != nil {
+	if _, err := io.Copy(w, r); err != nil {
 		return err
 	}
 

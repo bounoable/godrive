@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -53,6 +54,16 @@ func NewDisk(client *s3.Client, region, bucket string, options ...Option) *Disk 
 
 // Put writes b to the file with the given key.
 func (d *Disk) Put(ctx context.Context, key string, b []byte) error {
+	return d.PutReader(ctx, key, bytes.NewReader(b))
+}
+
+// PutReader writes b to the file with the given key.
+func (d *Disk) PutReader(ctx context.Context, key string, r io.Reader) error {
+	b, err := ioutil.ReadAll(r)
+	if err != nil {
+		return err
+	}
+
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(d.Config.Bucket),
 		Key:    aws.String(key),
