@@ -1,11 +1,11 @@
 module github.com/bounoable/godrive
 
-go 1.13
+go 1.16
 
 require (
-	cloud.google.com/go/storage v1.5.0
+	cloud.google.com/go/storage v1.10.0
 	github.com/aws/aws-sdk-go-v2 v0.19.0
-	github.com/stretchr/testify v1.4.0
-	google.golang.org/api v0.15.0
-	gopkg.in/yaml.v3 v3.0.0-20200121175148-a6ecf24a6d71
+	github.com/stretchr/testify v1.6.1
+	google.golang.org/api v0.52.0
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
