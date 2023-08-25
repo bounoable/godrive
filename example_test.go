@@ -16,7 +16,7 @@ func ExampleNew() {
 	// Manually configure disks
 	manager := godrive.New()
 
-	s3client := awss3.New(aws.Config{})
+	s3client := awss3.NewFromConfig(aws.Config{})
 	manager.Configure("main", s3.NewDisk(s3client, "REGION", "BUCKET", s3.Public(true)), godrive.Default()) // make it the default disk
 
 	gcsclient, _ := storage.NewClient(context.Background(), option.WithCredentialsFile("/path/to/service_account.json"))

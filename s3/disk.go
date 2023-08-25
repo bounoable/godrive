@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -59,7 +58,7 @@ func (d *Disk) Put(ctx context.Context, key string, b []byte) error {
 
 // PutReader writes b to the file with the given key.
 func (d *Disk) PutReader(ctx context.Context, key string, r io.Reader) error {
-	b, err := ioutil.ReadAll(r)
+	b, err := io.ReadAll(r)
 	if err != nil {
 		return err
 	}
@@ -74,45 +73,31 @@ func (d *Disk) PutReader(ctx context.Context, key string, r io.Reader) error {
 		input.ACL = "public-read"
 	}
 
-	if err := input.Validate(); err != nil {
-		return err
-	}
+	_, err = d.Client.PutObject(ctx, input)
 
-	req := d.Client.PutObjectRequest(input)
-	if _, err := req.Send(ctx); err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // Get retrieves the file with the given key.
 func (d *Disk) Get(ctx context.Context, key string) ([]byte, error) {
-	req := d.Client.GetObjectRequest(&s3.GetObjectInput{
+	obj, err := d.Client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(d.Config.Bucket),
 		Key:    aws.String(key),
 	})
-
-	res, err := req.Send(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return ioutil.ReadAll(res.Body)
+	return io.ReadAll(obj.Body)
 }
 
 // Delete deletes the file with the given key.
 func (d *Disk) Delete(ctx context.Context, key string) error {
-	req := d.Client.DeleteObjectRequest(&s3.DeleteObjectInput{
+	_, err := d.Client.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(d.Config.Bucket),
 		Key:    aws.String(key),
 	})
-
-	if _, err := req.Send(ctx); err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // GetURL returns the public URL for the file at path.

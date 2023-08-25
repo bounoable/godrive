@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/defaults"
-	"github.com/aws/aws-sdk-go-v2/aws/endpoints"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/bounoable/godrive"
 )
@@ -70,21 +69,16 @@ func NewAutoWire(ctx context.Context, cfg map[string]interface{}) (godrive.Disk,
 	}
 	public, _ := rpublic.(bool)
 
-	awscfg := aws.Config{
-		Region:           region,
-		EndpointResolver: endpoints.NewDefaultResolver(),
-		HTTPClient:       defaults.HTTPClient(),
-		Logger:           defaults.Logger(),
-		Handlers:         defaults.Handlers(),
-		Credentials: aws.StaticCredentialsProvider{
-			Value: aws.Credentials{
-				AccessKeyID:     accessKeyID,
-				SecretAccessKey: secretAccessKey,
-			},
-		},
+	awscfg, err := config.LoadDefaultConfig(
+		ctx,
+		config.WithRegion(region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKeyID, secretAccessKey, "")),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("load aws config: %w", err)
 	}
 
-	return NewDisk(s3.New(awscfg), region, bucket, Public(public)), nil
+	return NewDisk(s3.NewFromConfig(awscfg), region, bucket, Public(public)), nil
 }
 
 // InvalidConfigValueError means the autowire configuration has an invalid config value.
